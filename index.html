@@ -105,6 +105,15 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .add-set-btn:hover{border-color:var(--gold);color:var(--gold);}
 .prev-best{font-size:10px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
 .prev-best span{color:var(--green);font-weight:600;}
+
+/* DATE PICKER */
+.date-picker-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
+.date-picker-label{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:0.08em;white-space:nowrap;}
+.date-input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;color:var(--text);font-family:'Inter',sans-serif;font-size:14px;font-weight:600;padding:10px 14px;outline:none;margin:0;cursor:pointer;}
+.date-input:focus{border-color:var(--gold);}
+.date-today-btn{background:var(--gold-dim);border:1px solid rgba(245,200,66,0.3);border-radius:8px;color:var(--gold);font-family:'Inter',sans-serif;font-size:11px;font-weight:700;padding:10px 12px;cursor:pointer;white-space:nowrap;}
+.date-today-btn:hover{background:var(--gold);color:#080808;}
+
 /* FEEL */
 .feel-row{display:flex;gap:6px;margin-bottom:16px;}
 .feel-btn{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 4px;text-align:center;cursor:pointer;transition:all 0.15s;}
@@ -224,6 +233,11 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
 <!-- WORKOUT -->
 <div class="screen" id="screen-workout">
   <div class="app-header"><div class="app-title">Log <span>Workout</span></div></div>
+  <div class="date-picker-row">
+    <div class="date-picker-label">SESSION DATE</div>
+    <input type="date" class="date-input" id="sessionDate" />
+    <button class="date-today-btn" onclick="setToday()">Today</button>
+  </div>
   <div class="section-title">Session Type</div>
   <div class="cat-grid-2" style="margin-bottom:16px;">
     <div class="cat-chip" data-type="Gym" onclick="selectType(this)"><span class="ci">🏋️</span><span class="cn">Gym</span></div>
@@ -695,7 +709,8 @@ function collectExercises(){
 async function logWorkout(){
   if(!selectedType){ showStatus('workoutStatus','Pick a session type first.','error'); return; }
   const exercises=selectedType==='Gym'?collectExercises():[];
-  const session={date:todayKey(),ts:Date.now(),type:selectedType,muscles:[...selectedMuscles],feel:selectedFeel,exercises,notes:document.getElementById('workoutNotes').value.trim()};
+  const sessionDate=document.getElementById('sessionDate').value||todayKey();
+  const session={date:sessionDate,ts:Date.now(),type:selectedType,muscles:[...selectedMuscles],feel:selectedFeel,exercises,notes:document.getElementById('workoutNotes').value.trim()};
   state.sessions.push(session); saveState(); checkBadges();
   // Reset
   selectedType=null; selectedMuscles.clear(); selectedFeel=null; selectedExercises.clear(); addedExercises=[];
@@ -706,6 +721,7 @@ async function logWorkout(){
   document.getElementById('addMoreBtn').style.display='none';
   document.getElementById('muscleSection').style.display='none';
   document.getElementById('workoutNotes').value='';
+  initDatePicker();
   renderRecentActivity(); renderWeekDays(); updateDisciplineScore();
   showStatus('workoutStatus','✅ Session logged! +100 XP','success');
   await addXP(100,'Session');
@@ -812,6 +828,7 @@ function showScreen(name,el){
   document.getElementById('screen-'+name).classList.add('active');
   el.classList.add('active');
   if(name==='progress'){ renderMetricCards(); renderGoalProgress(); }
+  if(name==='workout'){ initDatePicker(); }
 }
 
 // ═══ UTILS ═══
@@ -837,12 +854,23 @@ function renderAll(){
   if(state.goals.sessions) document.getElementById('goal-sessions').value=state.goals.sessions;
 }
 
+// ═══ DATE PICKER ═══
+function initDatePicker(){
+  const input=document.getElementById('sessionDate');
+  input.value=todayKey();
+  input.max=todayKey();
+}
+function setToday(){
+  document.getElementById('sessionDate').value=todayKey();
+}
+
 // ═══ INIT ═══
 async function init(){
   loadState();
   document.getElementById('todayDate').innerHTML=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'});
   if(scriptUrl){ document.getElementById('syncSetupCard').classList.add('hidden'); await loadFromSheet(); }
   else setSyncStatus('','Not synced · Set up in Goals tab');
+  initDatePicker();
   renderAll();
 }
 
