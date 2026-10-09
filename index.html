@@ -106,6 +106,39 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .prev-best{font-size:10px;color:var(--muted);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
 .prev-best span{color:var(--green);font-weight:600;}
 
+
+/* MULTI-SELECT SESSION TYPES */
+.session-type-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px;}
+.session-chip{background:var(--surface);border:2px solid var(--border);border-radius:12px;padding:14px 6px 10px;text-align:center;cursor:pointer;transition:all 0.15s;user-select:none;-webkit-tap-highlight-color:transparent;}
+.session-chip .ci{font-size:22px;display:block;margin-bottom:4px;}
+.session-chip .cn{font-size:9px;font-weight:700;color:var(--muted2);text-transform:uppercase;letter-spacing:0.05em;}
+.session-chip.sel{border-color:var(--gold);background:var(--gold-dim);}
+.session-chip.sel .cn{color:var(--gold);}
+
+/* CARDIO SUB-PICKER */
+.cardio-sub{background:var(--surface);border:1px solid rgba(245,200,66,0.25);border-radius:12px;padding:14px;margin-bottom:12px;display:none;}
+.cardio-sub.visible{display:block;}
+.cardio-sub-title{font-size:10px;font-weight:700;color:var(--gold);letter-spacing:0.1em;margin-bottom:10px;}
+.cardio-sub-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;}
+.cardio-chip{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;cursor:pointer;transition:all 0.15s;font-size:12px;font-weight:600;color:var(--muted2);}
+.cardio-chip.sel{border-color:var(--gold);background:var(--gold-dim);color:var(--gold);}
+
+/* CARDIO DETAIL FIELDS */
+.cardio-fields{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;display:none;}
+.cardio-fields.visible{display:block;}
+.cardio-fields-title{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:0.1em;margin-bottom:10px;}
+.cardio-fields-grid{display:grid;gap:8px;}
+.cardio-field-wrap{background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:10px;text-align:center;}
+.cardio-field-wrap label{font-size:9px;font-weight:700;color:var(--muted2);display:block;margin-bottom:5px;letter-spacing:0.08em;}
+.cardio-field-wrap input{background:none;border:none;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:26px;text-align:center;outline:none;width:100%;padding:0;margin:0;}
+
+/* PUSHUPS COUNTER */
+.pushups-row{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-bottom:12px;}
+.pushups-icon{font-size:22px;}
+.pushups-label{font-size:13px;font-weight:600;flex:1;}
+.pushups-input{background:var(--surface2);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'Bebas Neue',sans-serif;font-size:24px;font-weight:700;text-align:center;outline:none;width:80px;padding:8px 6px;}
+.pushups-input:focus{border-color:var(--gold);}
+
 /* DATE PICKER */
 .date-picker-row{display:flex;align-items:center;gap:10px;margin-bottom:16px;}
 .date-picker-label{font-size:10px;font-weight:700;color:var(--muted2);letter-spacing:0.08em;white-space:nowrap;}
@@ -238,16 +271,37 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
     <input type="date" class="date-input" id="sessionDate" />
     <button class="date-today-btn" onclick="setToday()">Today</button>
   </div>
-  <div class="section-title">Session Type</div>
-  <div class="cat-grid-2" style="margin-bottom:16px;">
-    <div class="cat-chip" data-type="Gym" onclick="selectType(this)"><span class="ci">🏋️</span><span class="cn">Gym</span></div>
-    <div class="cat-chip" data-type="Run" onclick="selectType(this)"><span class="ci">🏃</span><span class="cn">Run</span></div>
-    <div class="cat-chip" data-type="Walk" onclick="selectType(this)"><span class="ci">🚶</span><span class="cn">Walk</span></div>
-    <div class="cat-chip" data-type="Cardio" onclick="selectType(this)"><span class="ci">❤️</span><span class="cn">Cardio</span></div>
-    <div class="cat-chip" data-type="HIIT" onclick="selectType(this)"><span class="ci">⚡</span><span class="cn">HIIT</span></div>
-    <div class="cat-chip" data-type="Badminton" onclick="selectType(this)"><span class="ci">🏸</span><span class="cn">Badminton</span></div>
-    <div class="cat-chip" data-type="Pickleball" onclick="selectType(this)"><span class="ci">🥒</span><span class="cn">Pickleball</span></div>
-    <div class="cat-chip" data-type="Sauna" onclick="selectType(this)"><span class="ci">🧖</span><span class="cn">Sauna</span></div>
+  <div class="section-title">Session Type <span style="color:var(--muted);font-size:9px;font-weight:400;">— select all that apply</span></div>
+  <div class="session-type-grid">
+    <div class="session-chip" data-type="Gym" onclick="toggleSessionType(this)"><span class="ci">🏋️</span><span class="cn">Gym</span></div>
+    <div class="session-chip" data-type="Cardio" onclick="toggleSessionType(this)"><span class="ci">❤️</span><span class="cn">Cardio</span></div>
+    <div class="session-chip" data-type="Badminton" onclick="toggleSessionType(this)"><span class="ci">🏸</span><span class="cn">Badminton</span></div>
+    <div class="session-chip" data-type="Pickleball" onclick="toggleSessionType(this)"><span class="ci">🥒</span><span class="cn">Pickleball</span></div>
+    <div class="session-chip" data-type="Sauna" onclick="toggleSessionType(this)"><span class="ci">🧖</span><span class="cn">Sauna</span></div>
+  </div>
+
+  <!-- CARDIO SUB-TYPE -->
+  <div class="cardio-sub" id="cardioSub">
+    <div class="cardio-sub-title">CARDIO TYPE</div>
+    <div class="cardio-sub-grid">
+      <div class="cardio-chip" data-cardio="Incline Walk" onclick="selectCardioType(this)">🚶 Incline Walk</div>
+      <div class="cardio-chip" data-cardio="Hike" onclick="selectCardioType(this)">🥾 Hike</div>
+      <div class="cardio-chip" data-cardio="Run" onclick="selectCardioType(this)">🏃 Run</div>
+      <div class="cardio-chip" data-cardio="HIIT" onclick="selectCardioType(this)">⚡ HIIT</div>
+    </div>
+  </div>
+
+  <!-- CARDIO DETAIL FIELDS -->
+  <div class="cardio-fields" id="cardioFields">
+    <div class="cardio-fields-title" id="cardioFieldsTitle">INCLINE WALK DETAILS</div>
+    <div class="cardio-fields-grid" id="cardioFieldsGrid"></div>
+  </div>
+
+  <!-- PUSH-UPS -->
+  <div class="pushups-row">
+    <span class="pushups-icon">⬇️</span>
+    <span class="pushups-label">Push-ups today</span>
+    <input type="number" class="pushups-input" id="pushupsCount" placeholder="0" min="0">
   </div>
 
   <!-- GYM SECTION -->
@@ -405,11 +459,42 @@ const URL_KEY = 'sdScriptUrl';
 let scriptUrl = localStorage.getItem(URL_KEY) || '';
 let state = { xp:0, sessions:[], habits:{}, bodyMetrics:[], goals:{}, badges:[] };
 
-function loadState() { try { const s=localStorage.getItem(SK); if(s) state={...state,...JSON.parse(s)}; } catch(e){} }
+function loadState() {
+  try {
+    const s=localStorage.getItem(SK);
+    if(s) {
+      const parsed=JSON.parse(s);
+      state={...state,...parsed};
+      // Migrate old sessions: ensure date field exists, types array exists
+      state.sessions = (state.sessions||[]).map(sess => {
+        // Fix missing date: try to derive from ts timestamp
+        if(!sess.date || sess.date==='undefined' || sess.date==='null') {
+          if(sess.ts) {
+            const d=new Date(sess.ts);
+            sess.date=d.toISOString().split('T')[0];
+          } else {
+            sess.date=todayKey();
+          }
+        }
+        // Fix missing types array: derive from type string
+        if(!sess.types || !Array.isArray(sess.types)) {
+          sess.types = sess.type ? sess.type.split(' + ').map(t=>t.trim()) : [];
+        }
+        return sess;
+      });
+    }
+  } catch(e){}
+}
 function saveState() { localStorage.setItem(SK, JSON.stringify(state)); }
 function todayKey() { return new Date().toISOString().split('T')[0]; }
-function formatDate(iso) { const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}); }
-function getDayName(iso) { const d=new Date(iso+'T00:00:00'); return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]; }
+function formatDate(iso) {
+  if(!iso || iso==='undefined' || iso==='null') return '—';
+  try { const d=new Date(iso+'T00:00:00'); if(isNaN(d)) return '—'; return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}); } catch(e){return '—';}
+}
+function getDayName(iso) {
+  if(!iso || iso==='undefined' || iso==='null') return '—';
+  try { const d=new Date(iso+'T00:00:00'); if(isNaN(d)) return '—'; return ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()]; } catch(e){return '—';}
+}
 
 // ═══ SYNC ═══
 function setSyncStatus(status, msg) {
@@ -556,7 +641,7 @@ function updateDisciplineScore(){
 
 // ═══ WEEKLY ═══
 function renderWeekDays(){
-  const today=new Date(), sessionDates=new Set(state.sessions.map(s=>s.date)), days=[];
+  const today=new Date(), sessionDates=new Set(state.sessions.map(s=>s.date).filter(Boolean)), days=[];
   for(let i=6;i>=0;i--){ const d=new Date(today); d.setDate(today.getDate()-i); days.push(d); }
   document.getElementById('weekDays').innerHTML=days.map(d=>{
     const iso=d.toISOString().split('T')[0], isToday=iso===todayKey(), has=sessionDates.has(iso);
@@ -574,9 +659,9 @@ function renderRecentActivity(){
   if(!recent.length){ el.innerHTML='<div class="empty"><span class="empty-icon">🏋️</span>No sessions yet. Log your first!</div>'; return; }
   el.innerHTML=recent.map(s=>`
     <div class="activity-item">
-      <div class="activity-icon">${icons[s.type]||'💪'}</div>
+      <div class="activity-icon">${s.types?.includes('Gym')?'🏋️':s.types?.includes('Cardio')?'❤️':s.types?.includes('Badminton')?'🏸':s.types?.includes('Pickleball')?'🥒':s.types?.includes('Sauna')?'🧖':icons[s.type]||'💪'}</div>
       <div class="activity-info">
-        <div class="activity-title">${s.type}${s.muscles?.length?' · '+s.muscles.join(', '):''}</div>
+        <div class="activity-title">${s.type}${s.muscles?.length?' · '+s.muscles.join(', '):''}${s.cardioType?' · '+s.cardioType:''}${s.pushups?' · '+s.pushups+' push-ups':''}</div>
         <div class="activity-meta">${getDayName(s.date)}, ${formatDate(s.date)}${s.feel?' · '+['😩','😐','😊','💪','🔥'][s.feel-1]:''}</div>
       </div>
       <div class="activity-xp">+100 XP</div>
@@ -584,14 +669,84 @@ function renderRecentActivity(){
 }
 
 // ═══ WORKOUT ═══
-let selectedType=null, selectedMuscles=new Set(), selectedFeel=null, selectedExercises=new Set(), addedExercises=[];
+let selectedTypes=new Set(), selectedMuscles=new Set(), selectedFeel=null, selectedExercises=new Set(), addedExercises=[], selectedCardioType=null;
 
-function selectType(el){
-  document.querySelectorAll('.cat-grid-2 .cat-chip').forEach(c=>{ if(!c.dataset.muscle) c.classList.remove('selected'); });
-  el.classList.add('selected'); selectedType=el.dataset.type;
-  document.getElementById('muscleSection').style.display=selectedType==='Gym'?'block':'none';
-  if(selectedType!=='Gym'){ selectedMuscles.clear(); selectedExercises.clear(); addedExercises=[]; document.getElementById('exerciseLog').innerHTML=''; document.getElementById('exercisePicker').style.display='none'; document.getElementById('addMoreBtn').style.display='none'; }
+// CARDIO FIELD CONFIGS
+const CARDIO_FIELDS = {
+  'Incline Walk': [
+    {id:'cf-duration',label:'DURATION (mins)',placeholder:'30'},
+    {id:'cf-speed',label:'SPEED (km/h)',placeholder:'5.5'},
+    {id:'cf-incline',label:'INCLINE (%)',placeholder:'10'}
+  ],
+  'Hike': [
+    {id:'cf-duration',label:'DURATION (mins)',placeholder:'60'},
+    {id:'cf-distance',label:'DISTANCE (km)',placeholder:'5'}
+  ],
+  'Run': [
+    {id:'cf-duration',label:'DURATION (mins)',placeholder:'30'},
+    {id:'cf-distance',label:'DISTANCE (km)',placeholder:'5'},
+    {id:'cf-pace',label:'PACE (min/km)',placeholder:'6:00'}
+  ],
+  'HIIT': [
+    {id:'cf-duration',label:'DURATION (mins)',placeholder:'20'},
+    {id:'cf-rounds',label:'ROUNDS',placeholder:'8'}
+  ]
+};
+
+let selectedTypes = new Set();
+let selectedCardioType = null;
+
+function toggleSessionType(el){
+  const type = el.dataset.type;
+  if(selectedTypes.has(type)){
+    selectedTypes.delete(type);
+    el.classList.remove('sel');
+  } else {
+    selectedTypes.add(type);
+    el.classList.add('sel');
+  }
+  // Show/hide cardio sub-picker
+  const showCardio = selectedTypes.has('Cardio');
+  document.getElementById('cardioSub').classList.toggle('visible', showCardio);
+  if(!showCardio){
+    selectedCardioType=null;
+    document.querySelectorAll('.cardio-chip').forEach(c=>c.classList.remove('sel'));
+    document.getElementById('cardioFields').classList.remove('visible');
+  }
+  // Show/hide gym section
+  document.getElementById('muscleSection').style.display=selectedTypes.has('Gym')?'block':'none';
+  if(!selectedTypes.has('Gym')){ selectedMuscles.clear(); selectedExercises.clear(); addedExercises=[]; document.getElementById('exerciseLog').innerHTML=''; document.getElementById('exercisePicker').style.display='none'; document.getElementById('addMoreBtn').style.display='none'; }
 }
+
+function selectCardioType(el){
+  document.querySelectorAll('.cardio-chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  selectedCardioType = el.dataset.cardio;
+  const fields = CARDIO_FIELDS[selectedCardioType]||[];
+  document.getElementById('cardioFieldsTitle').textContent = selectedCardioType.toUpperCase() + ' DETAILS';
+  const cols = fields.length === 3 ? 'grid-template-columns:1fr 1fr 1fr' : fields.length === 2 ? 'grid-template-columns:1fr 1fr' : 'grid-template-columns:1fr';
+  document.getElementById('cardioFieldsGrid').style.cssText = cols;
+  document.getElementById('cardioFieldsGrid').innerHTML = fields.map(f=>`
+    <div class="cardio-field-wrap">
+      <label>${f.label}</label>
+      <input type="number" id="${f.id}" placeholder="${f.placeholder}" step="any">
+    </div>`).join('');
+  document.getElementById('cardioFields').classList.add('visible');
+}
+
+function getCardioDetails(){
+  if(!selectedCardioType) return {};
+  const fields = CARDIO_FIELDS[selectedCardioType]||[];
+  const details = {type: selectedCardioType};
+  fields.forEach(f=>{
+    const el=document.getElementById(f.id);
+    if(el&&el.value) details[f.id.replace('cf-','')] = parseFloat(el.value)||el.value;
+  });
+  return details;
+}
+
+// Legacy - keep for compat
+function selectType(el){}
 
 function toggleMuscle(el){
   const m=el.dataset.muscle;
@@ -707,24 +862,43 @@ function collectExercises(){
 }
 
 async function logWorkout(){
-  if(!selectedType){ showStatus('workoutStatus','Pick a session type first.','error'); return; }
-  const exercises=selectedType==='Gym'?collectExercises():[];
-  const sessionDate=document.getElementById('sessionDate').value||todayKey();
-  const session={date:sessionDate,ts:Date.now(),type:selectedType,muscles:[...selectedMuscles],feel:selectedFeel,exercises,notes:document.getElementById('workoutNotes').value.trim()};
+  if(!selectedTypes.size){ showStatus('workoutStatus','Pick at least one session type.','error'); return; }
+  const hasGym = selectedTypes.has('Gym');
+  const exercises = hasGym ? collectExercises() : [];
+  const pushups = parseInt(document.getElementById('pushupsCount').value)||0;
+  const cardioDetails = getCardioDetails();
+  const sessionDate = document.getElementById('sessionDate').value||todayKey();
+  const typeLabel = [...selectedTypes].join(' + ');
+  const session={
+    date:sessionDate, ts:Date.now(),
+    type:typeLabel,
+    types:[...selectedTypes],
+    muscles:[...selectedMuscles],
+    feel:selectedFeel,
+    exercises,
+    pushups: pushups||null,
+    cardioType: selectedCardioType,
+    cardioDetails,
+    notes:document.getElementById('workoutNotes').value.trim()
+  };
   state.sessions.push(session); saveState(); checkBadges();
-  // Reset
-  selectedType=null; selectedMuscles.clear(); selectedFeel=null; selectedExercises.clear(); addedExercises=[];
+  selectedTypes.clear(); selectedMuscles.clear(); selectedFeel=null; selectedExercises.clear(); addedExercises=[]; selectedCardioType=null;
+  document.querySelectorAll('.session-chip').forEach(c=>c.classList.remove('sel'));
+  document.querySelectorAll('.cardio-chip').forEach(c=>c.classList.remove('sel'));
   document.querySelectorAll('.cat-chip').forEach(c=>c.classList.remove('selected'));
   document.querySelectorAll('.feel-btn').forEach(b=>b.className='feel-btn');
   document.getElementById('exerciseLog').innerHTML='';
   document.getElementById('exercisePicker').style.display='none';
   document.getElementById('addMoreBtn').style.display='none';
   document.getElementById('muscleSection').style.display='none';
+  document.getElementById('cardioSub').classList.remove('visible');
+  document.getElementById('cardioFields').classList.remove('visible');
+  document.getElementById('pushupsCount').value='';
   document.getElementById('workoutNotes').value='';
   initDatePicker();
   renderRecentActivity(); renderWeekDays(); updateDisciplineScore();
   showStatus('workoutStatus','✅ Session logged! +100 XP','success');
-  await addXP(100,'Session');
+  await addXP(100, typeLabel);
   await apiCall('logSession',session);
 }
 
