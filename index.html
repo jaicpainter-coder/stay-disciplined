@@ -693,9 +693,6 @@ const CARDIO_FIELDS = {
   ]
 };
 
-let selectedTypes = new Set();
-let selectedCardioType = null;
-
 function toggleSessionType(el){
   const type = el.dataset.type;
   if(selectedTypes.has(type)){
