@@ -25,6 +25,29 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .sync-dot.syncing{background:var(--gold);animation:pulse 1s infinite;}
 .sync-dot.error{background:var(--red);}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+.countdown-card{background:linear-gradient(135deg,#0a0a1a 0%,#0d0d0d 100%);border:1px solid rgba(77,166,255,0.2);border-radius:16px;padding:16px 18px;margin-bottom:16px;display:flex;align-items:center;gap:14px;position:relative;overflow:hidden;}
+.countdown-card::before{content:'';position:absolute;top:-20px;right:-20px;width:100px;height:100px;background:radial-gradient(circle,rgba(77,166,255,0.08) 0%,transparent 70%);}
+.countdown-days{font-family:'Bebas Neue',sans-serif;font-size:52px;color:var(--blue);letter-spacing:0.02em;line-height:1;flex-shrink:0;}
+.countdown-right{flex:1;}
+.countdown-label{font-size:9px;font-weight:700;color:var(--blue);letter-spacing:0.1em;opacity:0.7;margin-bottom:2px;}
+.countdown-goal{font-size:13px;font-weight:600;color:var(--text);line-height:1.4;margin-bottom:6px;}
+.countdown-bar-bg{background:var(--surface3);border-radius:4px;height:4px;overflow:hidden;}
+.countdown-bar-fill{height:100%;background:linear-gradient(90deg,var(--blue),#7ec8ff);border-radius:4px;transition:width 0.6s ease;}
+.countdown-pct{font-size:9px;color:var(--muted);margin-top:4px;}
+.sliders-card{background:var(--surface);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px;}
+.slider-row{margin-bottom:14px;}
+.slider-row:last-child{margin-bottom:0;}
+.slider-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.slider-label{font-size:12px;font-weight:600;color:var(--text);}
+.slider-value{font-size:12px;font-weight:700;color:var(--gold);min-width:48px;text-align:right;}
+input[type=range]{-webkit-appearance:none;width:100%;height:4px;border-radius:4px;outline:none;cursor:pointer;}
+input[type=range].sleep-slider{background:linear-gradient(90deg,var(--blue) var(--pct,0%),var(--surface3) var(--pct,0%));}
+input[type=range].scroll-slider{background:linear-gradient(90deg,var(--red) var(--pct,0%),var(--surface3) var(--pct,0%));}
+input[type=range].water-slider{background:linear-gradient(90deg,var(--blue) var(--pct,0%),var(--surface3) var(--pct,0%));}
+input[type=range].sugar-slider{background:linear-gradient(90deg,var(--green) var(--pct,0%),var(--surface3) var(--pct,0%));}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:18px;height:18px;border-radius:50%;background:var(--text);box-shadow:0 2px 6px rgba(0,0,0,0.5);cursor:pointer;}
+.slider-ticks{display:flex;justify-content:space-between;margin-top:4px;}
+.slider-tick{font-size:9px;color:var(--muted);}
 .level-card{background:linear-gradient(135deg,#1a1500 0%,#111 60%);border:1px solid rgba(245,200,66,0.25);border-radius:16px;padding:18px;margin-bottom:16px;position:relative;overflow:hidden;}
 .level-card::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;background:radial-gradient(circle,rgba(245,200,66,0.08) 0%,transparent 70%);}
 .level-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
@@ -65,6 +88,7 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;min-h
 .week-day-dot{width:28px;height:28px;border-radius:50%;background:var(--surface3);border:1px solid var(--border);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:12px;}
 .week-day-dot.active{background:var(--gold-dim);border-color:var(--gold);}
 .week-day-dot.today{background:var(--gold);border-color:var(--gold);}
+.week-multi{font-size:8px;color:var(--gold);text-align:center;margin-top:2px;font-weight:700;}
 .activity-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
 .activity-icon{width:40px;height:40px;border-radius:10px;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
 .activity-info{flex:1;}
@@ -233,6 +257,15 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
     <span id="syncText">Not synced</span>
     <span style="margin-left:auto;cursor:pointer;font-size:10px;color:var(--gold);" onclick="showScreen('settings',document.querySelectorAll('.nav-item')[3])">Setup →</span>
   </div>
+  <div class="countdown-card">
+    <div class="countdown-days" id="countdownDays">—</div>
+    <div class="countdown-right">
+      <div class="countdown-label">DAYS UNTIL DEC 31 2027</div>
+      <div class="countdown-goal">Get lean. Build muscle.<br>Sleep better. Stay disciplined.</div>
+      <div class="countdown-bar-bg"><div class="countdown-bar-fill" id="countdownBar" style="width:0%"></div></div>
+      <div class="countdown-pct" id="countdownPct"></div>
+    </div>
+  </div>
   <div class="level-card">
     <div class="level-row">
       <div class="level-badge" id="levelName">Lv 1 — Rookie</div>
@@ -250,15 +283,43 @@ hr{border:none;border-top:1px solid var(--border);margin:16px 0;}
     <div class="weekly-title">This Week</div>
     <div class="week-days" id="weekDays"></div>
   </div>
-  <div class="section-title">Today's Habits</div>
-  <div class="habit-grid">
-    <div class="habit-toggle" id="hab-sugar" onclick="toggleHabit('sugar')"><span class="habit-icon">🚫</span><div class="habit-info"><div class="habit-name">Sugar free</div><div class="habit-sub">+50 XP</div></div><span class="habit-check" id="hc-sugar">○</span></div>
-    <div class="habit-toggle" id="hab-water" onclick="toggleHabit('water')"><span class="habit-icon">💧</span><div class="habit-info"><div class="habit-name">Hydration</div><div class="habit-sub">+25 XP</div></div><span class="habit-check" id="hc-water">○</span></div>
-    <div class="habit-toggle" id="hab-sleep" onclick="toggleHabit('sleep')"><span class="habit-icon">😴</span><div class="habit-info"><div class="habit-name">Good sleep</div><div class="habit-sub">+25 XP</div></div><span class="habit-check" id="hc-sleep">○</span></div>
-    <div class="habit-toggle" id="hab-active" onclick="toggleHabit('active')"><span class="habit-icon">⚡</span><div class="habit-info"><div class="habit-name">Active day</div><div class="habit-sub">+30 XP</div></div><span class="habit-check" id="hc-active">○</span></div>
-  </div>
   <div class="section-title">Badges</div>
   <div class="badges-row" id="badgesRow"></div>
+  <div class="section-title">Daily Check-in</div>
+  <div class="sliders-card">
+    <div class="slider-row">
+      <div class="slider-header">
+        <span class="slider-label">😴 Sleep</span>
+        <span class="slider-value" id="val-sleep">—</span>
+      </div>
+      <input type="range" class="sleep-slider" id="sl-sleep" min="0" max="12" step="0.5" value="0" oninput="updateSlider('sleep',this.value)">
+      <div class="slider-ticks"><span class="slider-tick">0h</span><span class="slider-tick">4h</span><span class="slider-tick">8h</span><span class="slider-tick">12h</span></div>
+    </div>
+    <div class="slider-row">
+      <div class="slider-header">
+        <span class="slider-label">📱 Screen scroll time</span>
+        <span class="slider-value" id="val-scroll">—</span>
+      </div>
+      <input type="range" class="scroll-slider" id="sl-scroll" min="0" max="6" step="0.5" value="0" oninput="updateSlider('scroll',this.value)">
+      <div class="slider-ticks"><span class="slider-tick">0h</span><span class="slider-tick">2h</span><span class="slider-tick">4h</span><span class="slider-tick">6h+</span></div>
+    </div>
+    <div class="slider-row">
+      <div class="slider-header">
+        <span class="slider-label">💧 Water</span>
+        <span class="slider-value" id="val-water">—</span>
+      </div>
+      <input type="range" class="water-slider" id="sl-water" min="0" max="4" step="0.25" value="0" oninput="updateSlider('water',this.value)">
+      <div class="slider-ticks"><span class="slider-tick">0L</span><span class="slider-tick">1L</span><span class="slider-tick">2L</span><span class="slider-tick">3L</span><span class="slider-tick">4L</span></div>
+    </div>
+    <div class="slider-row">
+      <div class="slider-header">
+        <span class="slider-label">🍬 Sugar intake</span>
+        <span class="slider-value" id="val-sugar">—</span>
+      </div>
+      <input type="range" class="sugar-slider" id="sl-sugar" min="0" max="4" step="1" value="0" oninput="updateSlider('sugar',this.value)">
+      <div class="slider-ticks"><span class="slider-tick">None</span><span class="slider-tick">Little</span><span class="slider-tick">Some</span><span class="slider-tick">A lot</span><span class="slider-tick">Too much</span></div>
+    </div>
+  </div>
   <div class="section-title">Recent Activity</div>
   <div id="recentActivity"></div>
 </div>
@@ -471,7 +532,7 @@ function loadState() {
         if(!sess.date || sess.date==='undefined' || sess.date==='null') {
           if(sess.ts) {
             const d=new Date(sess.ts);
-            sess.date=d.toISOString().split('T')[0];
+            sess.date=localDateStr(d);
           } else {
             sess.date=todayKey();
           }
@@ -486,7 +547,8 @@ function loadState() {
   } catch(e){}
 }
 function saveState() { localStorage.setItem(SK, JSON.stringify(state)); }
-function todayKey() { return new Date().toISOString().split('T')[0]; }
+function localDateStr(d) { const dt=d||new Date(); return dt.getFullYear()+'-'+String(dt.getMonth()+1).padStart(2,'0')+'-'+String(dt.getDate()).padStart(2,'0'); }
+function todayKey() { return localDateStr(); }
 function formatDate(iso) {
   if(!iso || iso==='undefined' || iso==='null') return '—';
   try { const d=new Date(iso+'T00:00:00'); if(isNaN(d)) return '—'; return d.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}); } catch(e){return '—';}
@@ -634,21 +696,48 @@ function renderHabits(){
 
 function updateDisciplineScore(){
   const h=state.habits[todayKey()]||{};
-  const hScore=['sugar','water','sleep','active'].filter(k=>h[k]).length;
-  const hadSession=state.sessions.some(s=>s.date===todayKey());
-  document.getElementById('scoreDisc').textContent=Math.round(((hScore+(hadSession?1:0))/5)*10)+'/10';
+  const sleep=h.sl_sleep??0, water=h.sl_water??0, scroll=h.sl_scroll??6, sugar=h.sl_sugar??4;
+  // Score each slider: sleep ≥7h=1, water ≥2L=1, scroll ≤2h=1, sugar=0=1
+  const sleepOk=sleep>=7?1:sleep>=6?0.5:0;
+  const waterOk=water>=2?1:water>=1?0.5:0;
+  const scrollOk=scroll<=1?1:scroll<=2?0.5:0;
+  const sugarOk=sugar===0?1:sugar===1?0.5:0;
+  const hadSession=state.sessions.some(s=>s.date===todayKey())?1:0;
+  const total=Math.round(((sleepOk+waterOk+scrollOk+sugarOk+hadSession)/5)*10);
+  document.getElementById('scoreDisc').textContent=total+'/10';
 }
 
 // ═══ WEEKLY ═══
+function sessionEmoji(types){
+  if(!types||!types.length) return '💪';
+  if(types.includes('Gym')) return '🏋️';
+  if(types.includes('Run')) return '🏃';
+  if(types.includes('Walk')) return '🚶';
+  if(types.includes('Cardio')) return '❤️';
+  if(types.includes('HIIT')) return '⚡';
+  if(types.includes('Badminton')) return '🏸';
+  if(types.includes('Pickleball')) return '🥒';
+  if(types.includes('Sauna')) return '🧖';
+  return '💪';
+}
 function renderWeekDays(){
-  const today=new Date(), sessionDates=new Set(state.sessions.map(s=>s.date).filter(Boolean)), days=[];
-  for(let i=6;i>=0;i--){ const d=new Date(today); d.setDate(today.getDate()-i); days.push(d); }
+  const today=new Date(), days=[];
+  // Build a map of date → sessions for this week
+  const weekMap={};
+  for(let i=6;i>=0;i--){ const d=new Date(today); d.setDate(today.getDate()-i); days.push(d); weekMap[localDateStr(d)]=[]; }
+  state.sessions.forEach(s=>{ if(s.date && weekMap[s.date]) weekMap[s.date].push(s); });
   document.getElementById('weekDays').innerHTML=days.map(d=>{
-    const iso=d.toISOString().split('T')[0], isToday=iso===todayKey(), has=sessionDates.has(iso);
-    return `<div class="week-day"><div class="week-day-label">${['S','M','T','W','T','F','S'][d.getDay()]}</div>
-      <div class="week-day-dot ${isToday?'today':has?'active':''}">${has?'✓':''}</div></div>`;
+    const iso=localDateStr(d), isToday=iso===todayKey(), daySessions=weekMap[iso]||[], has=daySessions.length>0;
+    // Show emoji for first session type, or + count if multiple
+    const emoji = has ? sessionEmoji(daySessions[0].types||[daySessions[0].type]) : '';
+    const badge = has && daySessions.length>1 ? `<div class="week-multi">×${daySessions.length}</div>` : '';
+    return `<div class="week-day">
+      <div class="week-day-label">${['S','M','T','W','T','F','S'][d.getDay()]}</div>
+      <div class="week-day-dot ${isToday?'today':has?'active':''}" title="${has?daySessions.map(s=>s.type).join(', '):''}">${emoji}</div>
+      ${badge}
+    </div>`;
   }).join('');
-  document.getElementById('scoreWeek').textContent=days.filter(d=>sessionDates.has(d.toISOString().split('T')[0])).length;
+  document.getElementById('scoreWeek').textContent=days.filter(d=>(weekMap[localDateStr(d)]||[]).length>0).length;
 }
 
 // ═══ RECENT ACTIVITY ═══
@@ -893,7 +982,7 @@ async function logWorkout(){
   document.getElementById('pushupsCount').value='';
   document.getElementById('workoutNotes').value='';
   initDatePicker();
-  renderRecentActivity(); renderWeekDays(); updateDisciplineScore();
+  renderRecentActivity(); renderWeekDays(); updateDisciplineScore(); renderSliders();
   showStatus('workoutStatus','✅ Session logged! +100 XP','success');
   await addXP(100, typeLabel);
   await apiCall('logSession',session);
@@ -1016,8 +1105,59 @@ function exportData(){
 
 function clearConfirm(){ if(confirm('Reset all data?')){ localStorage.removeItem(SK); location.reload(); } }
 
+// ═══ SLIDERS ═══
+const SUGAR_LABELS=['None','A little','Some','A lot','Too much'];
+function updateSlider(key, val){
+  const today=todayKey();
+  if(!state.habits[today]) state.habits[today]={};
+  state.habits[today]['sl_'+key]=parseFloat(val);
+  saveState();
+  refreshSliderUI(key, parseFloat(val));
+  // Debounce sync to Sheets — only fires 1s after user stops sliding
+  clearTimeout(updateSlider._t);
+  updateSlider._t=setTimeout(()=>{
+    const h=state.habits[today];
+    apiCall('logSliders',{date:today,sleep:h.sl_sleep??null,scroll:h.sl_scroll??null,water:h.sl_water??null,sugar:h.sl_sugar??null});
+  },1000);
+}
+function refreshSliderUI(key, val){
+  const el=document.getElementById('sl-'+key);
+  if(!el) return;
+  let display='', max=parseFloat(el.max), pct=Math.round((val/max)*100)+'%';
+  el.style.setProperty('--pct', pct);
+  if(key==='sleep') display=val+'h';
+  else if(key==='scroll') display=val+'h';
+  else if(key==='water') display=val+'L';
+  else if(key==='sugar') display=SUGAR_LABELS[Math.round(val)]||'None';
+  document.getElementById('val-'+key).textContent=display;
+  el.value=val;
+}
+function renderSliders(){
+  const today=todayKey();
+  const h=state.habits[today]||{};
+  ['sleep','scroll','water','sugar'].forEach(key=>{
+    const saved=h['sl_'+key];
+    const val = (saved!==undefined) ? saved : (key==='sleep'?7:key==='water'?2:key==='scroll'?1:0);
+    refreshSliderUI(key, val);
+  });
+}
+
+function renderCountdown(){
+  const now=new Date();
+  const target=new Date('2026-12-31T23:59:59');
+  const start=new Date('2026-11-04T00:00:00'); // journey start
+  const msLeft=target-now;
+  const daysLeft=Math.max(0,Math.ceil(msLeft/(1000*60*60*24)));
+  const totalDays=Math.ceil((target-start)/(1000*60*60*24));
+  const elapsed=totalDays-daysLeft;
+  const pct=Math.min(100,Math.round((elapsed/totalDays)*100));
+  document.getElementById('countdownDays').textContent=daysLeft;
+  document.getElementById('countdownBar').style.width=pct+'%';
+  document.getElementById('countdownPct').textContent=pct+'% of the journey done · '+daysLeft+' days to go';
+}
+
 function renderAll(){
-  updateLevelUI(); renderHabits(); renderWeekDays(); renderBadges();
+  updateLevelUI(); renderWeekDays(); renderBadges(); renderCountdown(); renderSliders();
   renderRecentActivity(); updateDisciplineScore(); updateGoalDisplay();
   document.getElementById('scoreStreak').textContent=calcStreak();
   if(state.goals.weight) document.getElementById('goal-weight').value=state.goals.weight;
