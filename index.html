@@ -583,12 +583,40 @@ async function loadFromSheet() {
     const res = await fetch(scriptUrl+'?action=loadAll');
     const json = await res.json();
     if (json.success) {
-      state.sessions = json.sessions||state.sessions;
-      state.habits = json.habits||state.habits;
-      state.bodyMetrics = json.bodyMetrics||state.bodyMetrics;
-      state.xp = json.xp||state.xp;
-      state.goals = json.goals||state.goals;
-      state.badges = json.badges||state.badges;
+      // Merge sessions: combine local + Sheets, dedupe by ts then date+type
+      const localSessions = state.sessions||[];
+      const sheetSessions = json.sessions||[];
+      const merged = [...localSessions];
+      sheetSessions.forEach(ss => {
+        const exists = merged.some(ls =>
+          (ls.ts && ss.ts && ls.ts===ss.ts) ||
+          (ls.date===ss.date && ls.type===ss.type)
+        );
+        if (!exists) merged.push(ss);
+      });
+      merged.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+      state.sessions = merged;
+
+      // Merge habits: Sheets wins only for days not already in local
+      const sheetHabits = json.habits||{};
+      Object.keys(sheetHabits).forEach(day => {
+        if (!state.habits[day]) state.habits[day] = sheetHabits[day];
+      });
+
+      // Merge body metrics: same approach as sessions
+      const localBody = state.bodyMetrics||[];
+      const sheetBody = json.bodyMetrics||[];
+      sheetBody.forEach(sb => {
+        const exists = localBody.some(lb => lb.date===sb.date);
+        if (!exists) localBody.push(sb);
+      });
+      state.bodyMetrics = localBody.sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+
+      // Sheets wins for xp, goals, badges (single values)
+      if(json.xp) state.xp = Math.max(state.xp, json.xp);
+      if(json.goals) state.goals = json.goals;
+      if(json.badges) state.badges = [...new Set([...state.badges,...(json.badges||[])])];
+
       saveState(); renderAll();
       setSyncStatus('synced','Synced · '+new Date().toLocaleTimeString());
     }
